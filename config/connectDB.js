@@ -3,7 +3,7 @@ import colors from "colors";
 
 export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    const conn = await mongoose.connect("mongodb+srv://akkugunwal:akkugunwal@cluster0.3fb3wwd.mongodb.net/?retryWrites=true&w=majority", {
       dbName: "arcaptor_db",
     });
     console.log(
