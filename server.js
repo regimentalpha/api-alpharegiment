@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1", userRoues); // USER ROUTES
 
 // PORT -- On Which backend run
-const PORT = process.env.NODE_ENV === "Development" && process.env.PORT;
+const PORT = process.env.PORT || 8080;
 // RUN APP LISTENER AND CONNECT DB FUNCTION
 connectDB().then(() => {
   app.listen(PORT, () => {
