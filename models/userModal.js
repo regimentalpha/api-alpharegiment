@@ -2,15 +2,21 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: {
+    first_name: {
       type: String,
       required: true,
+    },
+    middle_name: {
+      type: String,
+    },
+    last_name: {
+      type: String,
     },
     email: {
       type: String,
       required: true,
     },
-    whatsAppNo: {
+    phone: {
       type: String,
       required: true,
     },
@@ -18,24 +24,42 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    DOB: {
-      type: Date,
+    dob: {
+      type: String,
+      required: true,
     },
-    qualification: {
+    address: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      required: true,
+    },
+    profile: {
       type: String,
     },
-    courseChoice: {
+    username: {
       type: String,
     },
-    courseMode: {
+    batch: {
       type: String,
     },
-    batchTime: {
+    chest_no: {
+      type: String,
+    },
+    emp_no: {
+      type: String,
+    },
+    player_prefab: {
+      type: String,
+    },
+    player_weight: {
       type: String,
     },
     role: {
       type: String,
-      default: "user",
+      default: "11",
     },
     fatherName: {
       type: String,

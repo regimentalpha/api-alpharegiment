@@ -6,16 +6,27 @@ import JWT from "jsonwebtoken";
 // USER REGISTRATION CONTROLLER
 export const userRegisterController = async (req, res, next) => {
   try {
-    const { fullName, email, whatsAppNo, password } = req.body;
+    const {
+      first_name,
+      middle_name,
+      last_name,
+      email,
+      phone,
+      password,
+      dob,
+      address,
+      gender,
+      profile,
+      fatherName,
+      motherName,
+      parentEmail,
+      parentWhatsAppNo,
+    } = req.body;
 
-    if (!fullName) {
-      return next(new ErrorHandler("Please enter full name", 400, res));
-    } else if (!email) {
-      return next(new ErrorHandler("Please enter email", 400, res));
-    } else if (!whatsAppNo) {
-      return next(new ErrorHandler("Please enter whatsapp number.", 400, res));
-    } else if (!password) {
-      return next(new ErrorHandler("Please enter password", 400, res));
+    if ((!first_name, !email, !phone, !password, !dob, !address, !gender)) {
+      return next(
+        new ErrorHandler("Please fill all required(*) fields.", 400, res)
+      );
     } else if (password.length <= 7) {
       return next(
         new ErrorHandler("Password must be minimum of 8 characters.", 400, res)
@@ -34,10 +45,20 @@ export const userRegisterController = async (req, res, next) => {
       const hashPassword = await bcrypt.hash(password, salt);
 
       await userModal.create({
-        fullName,
+        first_name,
+        middle_name,
+        last_name,
         email,
-        whatsAppNo,
+        phone,
         password: hashPassword,
+        dob,
+        address,
+        gender,
+        profile,
+        fatherName,
+        motherName,
+        parentEmail,
+        parentWhatsAppNo,
       });
 
       res.status(201).send({
