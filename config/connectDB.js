@@ -3,14 +3,17 @@ import colors from "colors";
 
 export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect("mongodb+srv://akkugunwal:akkugunwal@cluster0.3fb3wwd.mongodb.net/?retryWrites=true&w=majority", {
-      dbName: "arcaptor_db",
-    });
+    const conn = await mongoose.connect(
+      `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.5dqbvgf.mongodb.net/?retryWrites=true&w=majority`,
+      {
+        dbName: "alphaRegiment_db",
+      }
+    );
     console.log(
       `Connected to Mongo Database ${conn.connection.host}`.bgGreen.white
     );
   } catch (error) {
     console.log(`Error in MONGO DB ${error}`.bgRed.white);
-    process.exit(1)
+    process.exit(1);
   }
 };
