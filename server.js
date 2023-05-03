@@ -33,7 +33,6 @@ app.use(morgan("dev"));
 
 // ROUTES CONFIGURATION
 app.get("/", (req, res) => {
-  console.log(res);
   res.send(
     "<h1 style=text-align:center><a href=https://alpharegiment.com >Welcome to Alpha Regiment</a></h1>"
   );
