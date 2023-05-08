@@ -8,12 +8,10 @@ import bodyParser from "body-parser";
 import fileUpload from "express-fileupload";
 import { connectDB } from "./config/connectDB.js";
 import userRoues from "./routes/userRoutes.js";
+import { defaultErros } from "./middlewares/error.js";
 
 // configure dotenv file
 dotenv.config({ path: "./config/.env" });
-
-// connect database
-// connectDB();
 
 // rest object
 const app = express();
@@ -39,6 +37,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", userRoues); // USER ROUTES
+
+// Middleware for error
+app.use(defaultErros);
 
 // PORT -- On Which backend run
 const PORT = process.env.PORT || 8080;

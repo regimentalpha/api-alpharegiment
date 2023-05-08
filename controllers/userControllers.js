@@ -107,7 +107,7 @@ export const userLoginController = async (req, res, next) => {
 
     // GENERATE TOKEN
     const token = await JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "2d",
+      expiresIn: process.env.JWT_EXPIRE_IN,
     });
 
     res.status(200).send({
@@ -123,7 +123,7 @@ export const userLoginController = async (req, res, next) => {
 
 // GET LOGGED IN USER DETAILS
 export const userProfile = async (req, res, next) => {
-  const user = await userModal.findById(req.user?.id);
+  const user = await userModal.findById(req.user?.id).select("-password");
 
   if (!user) {
     return next(new ErrorHandler("User Not Found!", 404, res));
@@ -149,5 +149,57 @@ export const userLogout = async (req, res, next) => {
     success: true,
     message: "Logout Successfully",
     user,
+  });
+};
+
+// UPDATE USER PROFILE
+export const updateProfile = async (req, res, next) => {
+  const newUserData = {
+    first_name: req.body.first_name,
+    middle_name: req.body.middle_name,
+    last_name: req.body.last_name,
+    email: req.body.email,
+    phone: req.body.phone,
+    dob: req.body.dob,
+    address: req.body.address,
+    gender: req.body.gender,
+    profile: req.body.profile,
+    fatherName: req.body.fatherName,
+    motherName: req.body.motherName,
+    parentEmail: req.body.parentEmail,
+    parentWhatsAppNo: req.body.parentWhatsAppNo,
+  };
+
+  await userModal.findByIdAndUpdate(req.user?.id, newUserData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Profile Updated Successfully.",
+  });
+};
+
+// DELETE USER - ADMIN
+export const deleteUser = async (req, res, next) => {
+  const user = await userModal.findById(req.params.id);
+
+  if (!user) {
+    return next(
+      new ErrorHandler(
+        `User does not exist with id: ${req.params.id}`,
+        400,
+        res
+      )
+    );
+  }
+
+  await user.remove();
+
+  res.status(200).json({
+    success: true,
+    message: "User Deleted Successfully",
   });
 };

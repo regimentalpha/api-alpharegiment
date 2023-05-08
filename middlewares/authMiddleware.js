@@ -13,7 +13,7 @@ const protect = async (req, res, next) => {
       if (decode.exp < dateNow.getTime() / 1000) {
         new ErrorHandler("Token/Session Expired, Please login again", 404, res);
       } else {
-        req.user = await userModal.findById(decode.id);
+        req.user = await userModal.findById(decode.id).select("-password");
         next();
       }
     } catch (error) {
