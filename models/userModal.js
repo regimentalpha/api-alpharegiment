@@ -37,7 +37,12 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     profile: {
-      type: String,
+      public_id: {
+        type: String,
+      },
+      url: {
+        type: String,
+      },
     },
     username: {
       type: String,

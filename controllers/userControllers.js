@@ -2,55 +2,20 @@ import userModal from "../models/userModal.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
+import cloudinary from "cloudinary";
+import { catchAsyncError } from "../middlewares/catchAsyncErrors.js";
 
 // USER REGISTRATION CONTROLLER
-export const userRegisterController = async (req, res, next) => {
-  try {
-    const {
-      first_name,
-      middle_name,
-      last_name,
-      email,
-      phone,
-      password,
-      dob,
-      address,
-      gender,
-      profile,
-      fatherName,
-      motherName,
-      parentEmail,
-      parentWhatsAppNo,
-    } = req.body;
-
-    if ((!first_name, !email, !phone, !password, !dob, !address, !gender)) {
-      return next(
-        new ErrorHandler("Please fill all required(*) fields.", 400, res)
-      );
-    } else if (password.length <= 7) {
-      return next(
-        new ErrorHandler("Password must be minimum of 8 characters.", 400, res)
-      );
-    }
-
-    // Cheack user already registered or not
-    const isUserExisted = await userModal.findOne({ email });
-    if (isUserExisted) {
-      res.status(200).send({
-        success: true,
-        message: "User already existed. Please Login.",
-      });
-    } else {
-      const salt = await bcrypt.genSalt(10);
-      const hashPassword = await bcrypt.hash(password, salt);
-
-      await userModal.create({
+export const userRegisterController = catchAsyncError(
+  async (req, res, next) => {
+    try {
+      const {
         first_name,
         middle_name,
         last_name,
         email,
         phone,
-        password: hashPassword,
+        password,
         dob,
         address,
         gender,
@@ -59,21 +24,64 @@ export const userRegisterController = async (req, res, next) => {
         motherName,
         parentEmail,
         parentWhatsAppNo,
-      });
+      } = req.body;
 
-      res.status(201).send({
-        success: true,
-        message: "User registered successfully",
-      });
+      if ((!first_name, !email, !phone, !password, !dob, !address, !gender)) {
+        return next(
+          new ErrorHandler("Please fill all required(*) fields.", 400, res)
+        );
+      } else if (password.length <= 7) {
+        return next(
+          new ErrorHandler(
+            "Password must be minimum of 8 characters.",
+            400,
+            res
+          )
+        );
+      }
+
+      // Cheack user already registered or not
+      const isUserExisted = await userModal.findOne({ email });
+      if (isUserExisted) {
+        res.status(200).send({
+          success: true,
+          message: "User already existed. Please Login.",
+        });
+      } else {
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(password, salt);
+
+        await userModal.create({
+          first_name,
+          middle_name,
+          last_name,
+          email,
+          phone,
+          password: hashPassword,
+          dob,
+          address,
+          gender,
+          profile,
+          fatherName,
+          motherName,
+          parentEmail,
+          parentWhatsAppNo,
+        });
+
+        res.status(201).send({
+          success: true,
+          message: "User registered successfully",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return next(new ErrorHandler(error, 500, res));
     }
-  } catch (error) {
-    console.log(error);
-    return next(new ErrorHandler(error, 500, res));
   }
-};
+);
 
 // USER LOGIN CONTROLLER
-export const userLoginController = async (req, res, next) => {
+export const userLoginController = catchAsyncError(async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -119,10 +127,10 @@ export const userLoginController = async (req, res, next) => {
     console.log(error);
     return next(new ErrorHandler(error, 500, res));
   }
-};
+});
 
 // GET LOGGED IN USER DETAILS
-export const userProfile = async (req, res, next) => {
+export const userProfile = catchAsyncError(async (req, res, next) => {
   const user = await userModal.findById(req.user?.id).select("-password");
 
   if (!user) {
@@ -134,10 +142,10 @@ export const userProfile = async (req, res, next) => {
     message: "Login Successfully",
     user,
   });
-};
+});
 
 // LOG OUT USER
-export const userLogout = async (req, res, next) => {
+export const userLogout = catchAsyncError(async (req, res, next) => {
   const user = await userModal.findById(req.user?.id);
   if (!user) {
     return next(new ErrorHandler("User Not Found!", 404, res));
@@ -150,10 +158,10 @@ export const userLogout = async (req, res, next) => {
     message: "Logout Successfully",
     user,
   });
-};
+});
 
 // UPDATE USER PROFILE
-export const updateProfile = async (req, res, next) => {
+export const updateProfile = catchAsyncError(async (req, res, next) => {
   const newUserData = {
     first_name: req.body.first_name,
     middle_name: req.body.middle_name,
@@ -180,10 +188,88 @@ export const updateProfile = async (req, res, next) => {
     success: true,
     message: "Profile Updated Successfully.",
   });
-};
+});
+
+// UPLOAD PROFILE PICTURE
+export const uploadProfilePic = catchAsyncError(async (req, res, next) => {
+  if (req.body.profile !== "") {
+    const user = req.user;
+
+    if (user.profile.public_id !== "") {
+      cloudinary.v2.uploader.destroy(user.profile.public_id);
+
+      const myCloud = cloudinary.v2.uploader.upload(req.body.profile, {
+        folder: "avatars",
+        width: 100,
+        crop: "scale",
+      });
+
+      myCloud
+        .then(async (data) => {
+          const newUserData = {};
+          newUserData.profile = {
+            public_id: data.public_id,
+            url: data.secure_url,
+          };
+
+          await userModal.findByIdAndUpdate(req.user._id, newUserData, {
+            new: true,
+            runValidators: true,
+            useFindAndModify: false,
+          });
+        })
+        .catch((err) => {
+          return next(
+            new ErrorHandler(
+              "Something went wrong when uploading image",
+              400,
+              res
+            )
+          );
+        });
+    } else {
+      const myCloud = cloudinary.v2.uploader.upload(req.body.profile, {
+        folder: "avatars",
+        width: 100,
+        crop: "scale",
+      });
+
+      myCloud
+        .then(async (data) => {
+          const newUserData = {};
+          newUserData.profile = {
+            public_id: data.public_id,
+            url: data.secure_url,
+          };
+
+          await userModal.findByIdAndUpdate(req.user._id, newUserData, {
+            new: true,
+            runValidators: true,
+            useFindAndModify: false,
+          });
+        })
+        .catch((err) => {
+          return next(
+            new ErrorHandler(
+              "Something went wrong when uploading image",
+              400,
+              res
+            )
+          );
+        });
+    }
+  } else {
+    return next(new ErrorHandler("Please select a file", 404, res));
+  }
+
+  res.status(200).send({
+    success: true,
+    message: "Profile Pic Uploaded",
+  });
+});
 
 // DELETE USER - ADMIN
-export const deleteUser = async (req, res, next) => {
+export const deleteUser = catchAsyncError(async (req, res, next) => {
   const user = await userModal.findById(req.params.id);
 
   if (!user) {
@@ -202,4 +288,4 @@ export const deleteUser = async (req, res, next) => {
     success: true,
     message: "User Deleted Successfully",
   });
-};
+});

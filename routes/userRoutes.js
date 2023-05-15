@@ -2,21 +2,16 @@ import express from "express";
 import {
   deleteUser,
   updateProfile,
+  uploadProfilePic,
   userLoginController,
   userProfile,
   userRegisterController,
 } from "../controllers/userControllers.js";
 import protect from "../middlewares/authMiddleware.js";
-import userModal from "../models/userModal.js";
 import authorizeRoles from "../middlewares/roleAuth.js";
 
 // Router Object
 const router = express.Router();
-
-// TESTING API FOR TEST ===== GET API
-router.route("/testing").get(async (req, res) => {
-  res.status(200).send({ success: true, message: "Api Working Fine" });
-});
 
 // REGISTER ROUTE - POST REQUEST
 router.route("/register").post(userRegisterController);
@@ -29,6 +24,9 @@ router.route("/profile").get(protect, userProfile);
 
 // PROFILE UPDATE ROUTE - PUT REQUEST
 router.route("/update-profile").put(protect, updateProfile);
+
+// UPLOAD PROFILE PICTURE ===== POST REQUEST
+router.route("/upload-profile-pic").post(protect, uploadProfilePic);
 
 // =============== ADMIN ROUTES ================
 

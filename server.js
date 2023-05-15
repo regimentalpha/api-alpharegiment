@@ -7,18 +7,15 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import fileUpload from "express-fileupload";
 import { connectDB } from "./config/connectDB.js";
-import userRoues from "./routes/userRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import { defaultErros } from "./middlewares/error.js";
+import cloudinary from "cloudinary";
 
 // configure dotenv file
 dotenv.config({ path: "./config/.env" });
 
 // rest object
 const app = express();
-
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(fileUpload());
 
 // middlewares
 app.use(
@@ -28,15 +25,27 @@ app.use(
 );
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(cookieParser());
+app.use(fileUpload());
+app.use(bodyParser.json({ limit: "10000kb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "10000kb", extended: true }));
+
+// CONFIGURE CLOUDINARY FOR UPLOADING IMAGES
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  // secure: true,
+});
 
 // ROUTES CONFIGURATION
 app.get("/", (req, res) => {
   res.send(
-    "<h1 style=text-align:center><a href=https://alpharegiment.com >Welcome to Alpha Regiment</a></h1>"
+    "<h1 style=text-align:center><a href=https://alpharegiment.in >Welcome to Alpha Regiment</a></h1>"
   );
 });
 
-app.use("/api/v1", userRoues); // USER ROUTES
+app.use("/api/v1", userRoutes); // USER ROUTES
 
 // Middleware for error
 app.use(defaultErros);
