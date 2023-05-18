@@ -194,78 +194,64 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
 export const uploadProfilePic = catchAsyncError(async (req, res, next) => {
   if (req.body.profile !== "") {
     const user = req.user;
+    var newUserData = {
+      profile: {
+        public_id: "",
+        url: "",
+      },
+    };
 
-    if (user.profile.public_id !== "") {
-      cloudinary.v2.uploader.destroy(user.profile.public_id);
+    const result = await cloudinary.v2.uploader.upload(req.body.profile, {
+      folder: "avatars",
+      width: 150,
+      crop: "scale",
+    });
 
-      const myCloud = cloudinary.v2.uploader.upload(req.body.profile, {
-        folder: "avatars",
-        width: 100,
-        crop: "scale",
-      });
+    if (user.profile.public_id) {
+      await cloudinary.v2.uploader.destroy(user.profile.public_id);
+      if (result) {
+        newUserData.profile = {
+          public_id: result.public_id,
+          url: result.secure_url,
+        };
 
-      myCloud
-        .then(async (data) => {
-          const newUserData = {};
-          newUserData.profile = {
-            public_id: data.public_id,
-            url: data.secure_url,
-          };
-
-          await userModal.findByIdAndUpdate(req.user._id, newUserData, {
+        var updatedUser = await userModal.findByIdAndUpdate(
+          user._id,
+          newUserData,
+          {
             new: true,
             runValidators: true,
             useFindAndModify: false,
-          });
-        })
-        .catch((err) => {
-          return next(
-            new ErrorHandler(
-              "Something went wrong when uploading image",
-              400,
-              res
-            )
-          );
-        });
+          }
+        );
+      }
     } else {
-      const myCloud = cloudinary.v2.uploader.upload(req.body.profile, {
-        folder: "avatars",
-        width: 100,
-        crop: "scale",
-      });
+      if (result) {
+        newUserData.profile = {
+          public_id: result.public_id,
+          url: result.secure_url,
+        };
 
-      myCloud
-        .then(async (data) => {
-          const newUserData = {};
-          newUserData.profile = {
-            public_id: data.public_id,
-            url: data.secure_url,
-          };
-
-          await userModal.findByIdAndUpdate(req.user._id, newUserData, {
+        var updatedUser = await userModal.findByIdAndUpdate(
+          user._id,
+          newUserData,
+          {
             new: true,
             runValidators: true,
             useFindAndModify: false,
-          });
-        })
-        .catch((err) => {
-          return next(
-            new ErrorHandler(
-              "Something went wrong when uploading image",
-              400,
-              res
-            )
-          );
-        });
+          }
+        );
+      }
     }
   } else {
     return next(new ErrorHandler("Please select a file", 404, res));
   }
 
-  res.status(200).send({
-    success: true,
-    message: "Profile Pic Uploaded",
-  });
+  if (updatedUser)
+    res.status(200).send({
+      success: true,
+      message: "Profile Pic Uploaded",
+    });
 });
 
 // DELETE USER - ADMIN
