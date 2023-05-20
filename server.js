@@ -10,6 +10,7 @@ import { connectDB } from "./config/connectDB.js";
 import userRoutes from "./routes/userRoutes.js";
 import { defaultErros } from "./middlewares/error.js";
 import cloudinary from "cloudinary";
+import ErrorHandler from "./utils/errorHandler.js";
 
 // configure dotenv file
 dotenv.config({ path: "./config/.env" });
@@ -21,9 +22,9 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:3000/",
-      "http://senapariwar.com/",
-      "https://alpharegiment.in/",
+      "http://localhost:3000",
+      "http://senapariwar.com",
+      "https://alpharegiment.in",
     ],
   })
 );
