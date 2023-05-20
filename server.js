@@ -19,15 +19,7 @@ dotenv.config({ path: "./config/.env" });
 const app = express();
 
 // middlewares
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "http://senapariwar.com",
-      "https://alpharegiment.in",
-    ],
-  })
-);
+app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
