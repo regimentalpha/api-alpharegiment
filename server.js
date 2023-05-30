@@ -10,7 +10,6 @@ import { connectDB } from "./config/connectDB.js";
 import userRoutes from "./routes/userRoutes.js";
 import { defaultErros } from "./middlewares/error.js";
 import cloudinary from "cloudinary";
-import ErrorHandler from "./utils/errorHandler.js";
 
 // configure dotenv file
 dotenv.config({ path: "./config/.env" });
@@ -25,16 +24,16 @@ app.use(
   })
 );
 
-app.use(function (req, res, next) {
-  //Enabling CORS
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization"
-  );
-  next();
-});
+// app.use(function (req, res, next) {
+//   //Enabling CORS
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization"
+//   );
+//   next();
+// });
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());

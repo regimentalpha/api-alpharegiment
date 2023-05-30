@@ -203,8 +203,10 @@ export const uploadProfilePic = catchAsyncError(async (req, res, next) => {
 
     const result = await cloudinary.v2.uploader.upload(req.body.profile, {
       folder: "avatars",
-      width: 150,
-      crop: "scale",
+      width: 200,
+      height: 200,
+      aspectRatio: 1.0,
+      crop: "fill",
     });
 
     if (user.profile.public_id) {
