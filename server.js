@@ -25,6 +25,7 @@ app.use(
     headers: "*",
     allowedHeaders: "*",
     exposedHeaders: "*",
+    optionsSuccessStatus: 200,
   })
 );
 
@@ -55,7 +56,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1", cors(), userRoutes); // USER ROUTES
 
 // Middleware for error
-app.use(defaultErros());
+app.use(defaultErros);
 
 // PORT -- On Which backend run
 const PORT = process.env.PORT || 8080;
