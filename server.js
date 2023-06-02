@@ -29,8 +29,6 @@ app.use(
   })
 );
 
-app.options("*", cors());
-
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
@@ -53,7 +51,7 @@ app.get("/", (req, res) => {
   );
 });
 
-app.use("/api/v1", cors(), userRoutes); // USER ROUTES
+app.use("/api/v1", userRoutes); // USER ROUTES
 
 // Middleware for error
 app.use(defaultErros);
