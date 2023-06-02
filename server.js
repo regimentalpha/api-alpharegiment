@@ -28,16 +28,8 @@ app.use(
   })
 );
 
-// app.use(function (req, res, next) {
-//   //Enabling CORS
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization"
-//   );
-//   next();
-// });
+app.options("*", cors());
+
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
@@ -60,10 +52,10 @@ app.get("/", (req, res) => {
   );
 });
 
-app.use("/api/v1", userRoutes); // USER ROUTES
+app.use("/api/v1", cors(), userRoutes); // USER ROUTES
 
 // Middleware for error
-app.use(defaultErros);
+app.use(defaultErros());
 
 // PORT -- On Which backend run
 const PORT = process.env.PORT || 8080;
