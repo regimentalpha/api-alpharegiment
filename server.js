@@ -21,6 +21,10 @@ const app = express();
 app.use(
   cors({
     origin: "*",
+    method: "*",
+    headers: "*",
+    allowedHeaders: "*",
+    exposedHeaders: "*",
   })
 );
 
