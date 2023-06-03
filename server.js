@@ -20,8 +20,15 @@ const app = express();
 // middlewares
 app.use(
   cors({
-    origin: "*",
-    method: "*",
+    origin: [
+      "https://www.senapariwar.com/",
+      "https://senapariwar.com/",
+      "http://localhost:3000/",
+      "http://www.localhost:3000/",
+      "https://alpharegiment.in/",
+      "https://www.alpharegiment.in/"
+    ],
+    methods: "*",
     headers: "*",
     allowedHeaders: "*",
     exposedHeaders: "*",
