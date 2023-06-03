@@ -29,7 +29,7 @@ app.use(
       "https://www.alpharegiment.in",
     ],
     methods: "*",
-    headers: "OPTIONS,POST,GET, DELETE,PUT",
+    headers: "*",
     allowedHeaders: "*",
     exposedHeaders: "*",
     optionsSuccessStatus: 200,
