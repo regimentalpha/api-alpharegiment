@@ -256,6 +256,35 @@ export const uploadProfilePic = catchAsyncError(async (req, res, next) => {
     });
 });
 
+// remove profile picture
+export const removeProfilePic = catchAsyncError(async (req, res, next) => {
+  const user = req.user;
+  var newUserData = {
+    profile: {
+      public_id: "",
+      url: "",
+    },
+  };
+
+  if (user.profile.public_id) {
+    await cloudinary.v2.uploader.destroy(user.profile.public_id);
+
+    var updatedUser = await userModal.findByIdAndUpdate(user._id, newUserData, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+  } else {
+    next(new ErrorHandler("Profile not found", 404, res));
+  }
+
+  if (updatedUser)
+    res.status(200).send({
+      success: true,
+      message: "Profile picture removed",
+    });
+});
+
 // DELETE USER - ADMIN
 export const deleteUser = catchAsyncError(async (req, res, next) => {
   const user = await userModal.findById(req.params.id);

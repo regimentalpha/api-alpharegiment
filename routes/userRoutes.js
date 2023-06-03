@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteUser,
+  removeProfilePic,
   updateProfile,
   uploadProfilePic,
   userLoginController,
@@ -27,6 +28,9 @@ router.route("/update-profile").put(protect, updateProfile);
 
 // UPLOAD PROFILE PICTURE ===== POST REQUEST
 router.route("/upload-profile-pic").post(protect, uploadProfilePic);
+
+// UPLOAD PROFILE PICTURE ===== POST REQUEST
+router.route("/remove-profile-pic").delete(protect, removeProfilePic);
 
 // =============== ADMIN ROUTES ================
 
