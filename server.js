@@ -17,7 +17,7 @@ dotenv.config({ path: "./config/.env" });
 // rest object
 const app = express();
 
-// middlewares
+// middlewaress
 app.use(
   cors({
     origin: [
