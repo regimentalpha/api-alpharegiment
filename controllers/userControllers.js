@@ -131,7 +131,7 @@ export const userLoginController = catchAsyncError(async (req, res, next) => {
 
 // GET LOGGED IN USER DETAILS
 export const userProfile = catchAsyncError(async (req, res, next) => {
-  const user = await userModal.findById(req.user?.id).select("-password");
+  const user = await userModal.findById(req.user.id).select("-password");
 
   if (!user) {
     return next(new ErrorHandler("User Not Found!", 404, res));
