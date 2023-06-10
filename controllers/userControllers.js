@@ -146,7 +146,7 @@ export const userProfile = catchAsyncError(async (req, res, next) => {
 
 // LOG OUT USER
 export const userLogout = catchAsyncError(async (req, res, next) => {
-  const user = await userModal.findById(req.user?.id);
+  const user = await userModal.findById(req.user.id);
   if (!user) {
     return next(new ErrorHandler("User Not Found!", 404, res));
   }
@@ -178,7 +178,7 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
     parentWhatsAppNo: req.body.parentWhatsAppNo,
   };
 
-  await userModal.findByIdAndUpdate(req.user?.id, newUserData, {
+  await userModal.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
