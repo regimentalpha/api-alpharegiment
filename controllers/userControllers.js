@@ -83,10 +83,10 @@ export const userRegisterController = catchAsyncError(
 // USER LOGIN CONTROLLER
 export const userLoginController = catchAsyncError(async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, device_code } = req.body;
 
     // IF EMAIL OR PASSWORD NOT ENTERED
-    if (!email || !password) {
+    if (!email || (!password && !device_code)) {
       return next(
         new ErrorHandler("Please fill all the fields carefully", 404, res)
       );
@@ -107,10 +107,24 @@ export const userLoginController = catchAsyncError(async (req, res, next) => {
     }
 
     // is Password Match or not
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (password) {
+      const isPasswordMatch = await bcrypt.compare(password, user.password);
+      if (!isPasswordMatch) {
+        return next(
+          new ErrorHandler("Invalid username or password.", 404, res)
+        );
+      }
+    }
 
-    if (!isPasswordMatch) {
-      return next(new ErrorHandler("Invalid username or password.", 404, res));
+    // is Device Code match or not
+    if (device_code) {
+      const isDeviceCodeMatch = device_code === user.device_code;
+
+      if (!isDeviceCodeMatch) {
+        return next(
+          new ErrorHandler("Invalid username or device code.", 404, res)
+        );
+      }
     }
 
     // GENERATE TOKEN
@@ -125,13 +139,15 @@ export const userLoginController = catchAsyncError(async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    return next(new ErrorHandler(error, 500, res));
+    return next(new ErrorHandler(error.message, 500, res));
   }
 });
 
 // GET LOGGED IN USER DETAILS
 export const userProfile = catchAsyncError(async (req, res, next) => {
-  const user = await userModal.findById(req.user.id).select("-password");
+  const user = await userModal
+    .findById(req.user.id)
+    .select(["-password", "-device_code"]);
 
   if (!user) {
     return next(new ErrorHandler("User Not Found!", 404, res));
@@ -188,6 +204,42 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
     success: true,
     message: "Profile Updated Successfully.",
   });
+});
+
+// Create/Update device code
+export const deviceCodeGenerate = catchAsyncError(async (req, res, next) => {
+  try {
+    const { device_code } = req.body;
+    const user = req.user;
+
+    if (!user) {
+      return next(new ErrorHandler("User not found!", 404, res));
+    } else if (!device_code) {
+      return next(new ErrorHandler("device code not found!", 404, res));
+    } else if (device_code.length !== 6) {
+      return next(
+        new ErrorHandler("Device code must be only 6 characters.", 404, res)
+      );
+    }
+
+    await userModal.findByIdAndUpdate(
+      req.user._id,
+      { device_code },
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
+
+    res.status(200).send({
+      success: true,
+      message: "Device code updated successfully.",
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(error.message, 500, res));
+  }
 });
 
 // UPLOAD PROFILE PICTURE

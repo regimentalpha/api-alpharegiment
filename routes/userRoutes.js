@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteUser,
+  deviceCodeGenerate,
   removeProfilePic,
   updateProfile,
   uploadProfilePic,
@@ -26,16 +27,14 @@ router.route("/profile").get(protect, userProfile);
 // PROFILE UPDATE ROUTE - PUT REQUEST
 router.route("/update-profile").put(protect, updateProfile);
 
+// PROFILE UPDATE ROUTE - PUT REQUEST
+router.route("/update-dcode").put(protect, deviceCodeGenerate);
+
 // UPLOAD PROFILE PICTURE ===== POST REQUEST
 router.route("/upload-profile-pic").post(protect, uploadProfilePic);
 
 // UPLOAD PROFILE PICTURE ===== POST REQUEST
 router.route("/remove-profile-pic").delete(protect, removeProfilePic);
-
-// =============== ADMIN ROUTES ================
-
-// DELETE USER ROUTE - DELETE REQUEST ================ ADMIN ROUTE
-router.route("/delete-user").delete(protect, authorizeRoles(10), deleteUser);
 
 // PROTECTED USER ROUTE AUTH
 router.route("/user-auth").get(protect, async (req, res) => {

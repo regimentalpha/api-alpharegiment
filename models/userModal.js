@@ -24,6 +24,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    device_code: {
+      type: Number
+    },
     dob: {
       type: String,
       required: true,
@@ -76,6 +79,15 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     parentWhatsAppNo: {
+      type: String,
+    },
+    device_code: {
+      type: Number,
+    },
+    joining_date: {
+      type: String,
+    },
+    leaving_date: {
       type: String,
     },
   },

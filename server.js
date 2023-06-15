@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 import fileUpload from "express-fileupload";
 import { connectDB } from "./config/connectDB.js";
 import userRoutes from "./routes/userRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
 import { defaultErros } from "./middlewares/error.js";
 import cloudinary from "cloudinary";
 
@@ -51,6 +52,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", userRoutes); // USER ROUTES
+app.use("/api/v1", courseRoutes); // COURSE ROUTES
 
 // Middleware for error
 app.use(defaultErros);
