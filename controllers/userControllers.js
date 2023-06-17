@@ -222,7 +222,7 @@ export const deviceCodeGenerate = catchAsyncError(async (req, res, next) => {
       );
     }
 
-    await userModal.findByIdAndUpdate(
+    const updatedUser = await userModal.findByIdAndUpdate(
       req.user._id,
       { device_code },
       {
@@ -235,6 +235,7 @@ export const deviceCodeGenerate = catchAsyncError(async (req, res, next) => {
     res.status(200).send({
       success: true,
       message: "Device code updated successfully.",
+      updatedUser,
     });
   } catch (error) {
     console.log(error);

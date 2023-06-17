@@ -7,6 +7,10 @@ export const connectDB = async () => {
       `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.5dqbvgf.mongodb.net/?retryWrites=true&w=majority`,
       {
         dbName: "alphaRegiment_db",
+        w: "majority",
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        retryWrites: true,
       }
     );
     console.log(
