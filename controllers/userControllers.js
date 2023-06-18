@@ -118,7 +118,7 @@ export const userLoginController = catchAsyncError(async (req, res, next) => {
 
     // is Device Code match or not
     if (device_code) {
-      const isDeviceCodeMatch = device_code === user.device_code;
+      const isDeviceCodeMatch = device_code == user.device_code;
 
       if (!isDeviceCodeMatch) {
         return next(
