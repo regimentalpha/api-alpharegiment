@@ -9,8 +9,11 @@ import fileUpload from "express-fileupload";
 import { connectDB } from "./config/connectDB.js";
 import userRoutes from "./routes/userRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import affiliateRoutes from "./routes/affiliateRoutes.js";
+import instaMojoRoutes from "./routes/instaMojoRoutes.js";
 import { defaultErros } from "./middlewares/error.js";
 import cloudinary from "cloudinary";
+import Insta from "instamojo-nodejs";
 
 // configure dotenv file
 dotenv.config({ path: "./config/.env" });
@@ -44,6 +47,14 @@ cloudinary.config({
   // secure: true,
 });
 
+// INSTAMOJO VARIABLES
+const MOJO_TEST_API_KEY = "test_c925be7e1b4384c0466fa23bd33";
+const MOJO_TEST_AUTH_KEY = "test_777bacce8b2ee939476703fba9b";
+
+Insta.setKeys(process.env.INSTAMOJO_API_KEY, process.env.INSTAMOJO_AUTH_KEY);
+// Insta.setKeys(MOJO_TEST_API_KEY, MOJO_TEST_AUTH_KEY);
+Insta.isSandboxMode(true);
+
 // ROUTES CONFIGURATION
 app.get("/", (req, res) => {
   res.send(
@@ -53,6 +64,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1", userRoutes); // USER ROUTES
 app.use("/api/v1", courseRoutes); // COURSE ROUTES
+app.use("/api/v1", affiliateRoutes); // AFFILIATE ROUTES
+app.use("/api/v1", instaMojoRoutes); // INSTA MOJO ROUTES
 
 // Middleware for error
 app.use(defaultErros);

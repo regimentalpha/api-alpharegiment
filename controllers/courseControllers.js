@@ -15,6 +15,7 @@ export const createCourseController = catchAsyncError(
         study_mode,
         course_id,
         thumbnail,
+        starting_date,
       } = req.body;
 
       // FIND COURSE ID ALREADY EXISTING OR NOT
@@ -31,7 +32,8 @@ export const createCourseController = catchAsyncError(
         !discounted_price,
         !study_mode,
         !course_id,
-        !thumbnail)
+        !thumbnail,
+        !starting_date)
       ) {
         return next(
           new ErrorHandler("Please fill all required(*) fields.", 400, res)
@@ -58,6 +60,7 @@ export const createCourseController = catchAsyncError(
               url: result.secure_url,
             },
             created_by: req.user._id,
+            starting_date,
           });
         }
 

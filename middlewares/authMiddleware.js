@@ -19,7 +19,11 @@ const protect = async (req, res, next) => {
     } catch (error) {
       console.error(error);
       return next(
-        new ErrorHandler("Not Authorized, Token Failed/Expired", 404, res)
+        new ErrorHandler(
+          "Not Authorized, Token Failed/Expired, Please Login!",
+          404,
+          res
+        )
       );
     }
   } else {

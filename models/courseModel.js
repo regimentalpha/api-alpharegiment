@@ -26,6 +26,7 @@ const courseSchema = new mongoose.Schema(
       type: Number,
       required: true,
       maxLength: [3, "Course Id will be only three characters."],
+      minLength: [3, "Course Id will be only three characters."],
     },
     thumbnail: {
       public_id: {
@@ -35,7 +36,10 @@ const courseSchema = new mongoose.Schema(
         type: String,
       },
     },
-
+    starting_date: {
+      type: String,
+      required: true,
+    },
     created_by: {
       type: mongoose.Schema.ObjectId,
       ref: "Users",

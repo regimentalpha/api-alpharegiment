@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     device_code: {
-      type: Number
+      type: Number,
     },
     dob: {
       type: String,
@@ -90,6 +90,33 @@ const userSchema = new mongoose.Schema(
     leaving_date: {
       type: String,
     },
+    // AFFILIATE MARKETING PARAMETERS START
+    aff_occupation: {
+      type: String,
+    },
+    aff_state: {
+      type: String,
+    },
+    aff_bank_name: {
+      type: String,
+    },
+    aff_bank_ifsc: {
+      type: String,
+    },
+    aff_bank_acc_no: {
+      type: String,
+    },
+    aff_bank_branch: {
+      type: String,
+    },
+    aff_bank_reg_mob: {
+      type: String,
+    },
+    aff_upi_id: {
+      type: String,
+    },
+
+    // AFFILIATE MARKETING PARAMETERS ENDS
   },
   {
     timestamps: true,
