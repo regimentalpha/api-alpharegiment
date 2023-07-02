@@ -8,8 +8,6 @@ export const coursePaymentController = catchAsyncError(
       const { amount, purpose } = req.body;
       const user = req.user;
 
-      console.log(user);
-
       var paymenData = new Insta.PaymentData();
 
       const REDIRECT_URL = "https://alpharegiment.in/verification";
@@ -32,11 +30,7 @@ export const coursePaymentController = catchAsyncError(
           return next(new ErrorHandler(error.message, 404, res));
         } else {
           const resData = JSON.parse(response);
-          console.log(resData);
-          res.status(200).send({
-            success: true,
-            longUrl: resData?.payment_request?.longurl,
-          });
+          res.status(200).send(resData);
         }
       });
     } catch (error) {
