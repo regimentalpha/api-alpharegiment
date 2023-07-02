@@ -53,7 +53,7 @@ const MOJO_TEST_AUTH_KEY = "test_777bacce8b2ee939476703fba9b";
 
 Insta.setKeys(process.env.INSTAMOJO_API_KEY, process.env.INSTAMOJO_AUTH_KEY);
 // Insta.setKeys(MOJO_TEST_API_KEY, MOJO_TEST_AUTH_KEY);
-Insta.isSandboxMode(true);
+Insta.isSandboxMode(false);
 
 // ROUTES CONFIGURATION
 app.get("/", (req, res) => {
