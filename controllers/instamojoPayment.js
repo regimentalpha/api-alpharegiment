@@ -12,7 +12,7 @@ export const coursePaymentController = catchAsyncError(
 
       var paymenData = new Insta.PaymentData();
 
-      const REDIRECT_URL = "http://localhost:3000/verification";
+      const REDIRECT_URL = process.env.PAYMENT_REDIRECT_URL;
 
       paymenData.setRedirectUrl(REDIRECT_URL);
       paymenData.send_email = false;
@@ -21,8 +21,10 @@ export const coursePaymentController = catchAsyncError(
       paymenData.email = user.email;
       paymenData.phone = user.phone;
       paymenData.buyer_name =
-        user?.first_name + " " + user?.middle_name + " " + user?.last_name;
-      paymenData.webhook = "http://senapariwar.com/course-details";
+        user?.first_name + " " + user?.middle_name &&
+        user?.middle_name + " " + user?.last_name &&
+        user?.last_name;
+      paymenData.webhook = process.env.PAYMENT_WEBHOOK_URL;
       paymenData.send_sms = false;
       paymenData.allow_repeated_payments = false;
 
