@@ -6,7 +6,15 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    titleHindi: {
+      type: String,
+      required: true,
+    },
     description: {
+      type: String,
+      required: true,
+    },
+    descriptionHindi: {
       type: String,
       required: true,
     },
@@ -22,11 +30,8 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    course_id: {
-      type: Number,
-      required: true,
-      maxLength: [3, "Course Id will be only three characters."],
-      minLength: [3, "Course Id will be only three characters."],
+    affiliate_percentage: {
+      type: String,
     },
     thumbnail: {
       public_id: {
@@ -43,6 +48,22 @@ const courseSchema = new mongoose.Schema(
     created_by: {
       type: mongoose.Schema.ObjectId,
       ref: "Users",
+      required: true,
+    },
+    updated_by: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Users",
+    },
+    goalType: {
+      type: String,
+      required: true,
+    },
+    courseCategory: {
+      type: String,
+      required: true,
+    },
+    bannervideoLink: {
+      type: String,
       required: true,
     },
   },

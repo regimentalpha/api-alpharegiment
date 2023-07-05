@@ -13,17 +13,15 @@ export const createCourseController = catchAsyncError(
         original_price,
         discounted_price,
         study_mode,
-        course_id,
+        affiliate_percentage,
         thumbnail,
         starting_date,
+        titleHindi,
+        descriptionHindi,
+        goalType,
+        courseCategory,
+        bannervideoLink,
       } = req.body;
-
-      // FIND COURSE ID ALREADY EXISTING OR NOT
-      const courses = await courseModel.find();
-      let isCourseIdExist = "";
-      courses.forEach((i) => {
-        isCourseIdExist = i.course_id == course_id;
-      });
 
       if (
         (!title,
@@ -31,15 +29,15 @@ export const createCourseController = catchAsyncError(
         !original_price,
         !discounted_price,
         !study_mode,
-        !course_id,
         !thumbnail,
-        !starting_date)
+        !starting_date,
+        !titleHindi,
+        !descriptionHindi,
+        !bannervideoLink)
       ) {
         return next(
           new ErrorHandler("Please fill all required(*) fields.", 400, res)
         );
-      } else if (isCourseIdExist) {
-        return next(new ErrorHandler("Course Id already existing.", 400, res));
       } else {
         // upload thubnail on cloudinary
         const result = await cloudinary.v2.uploader.upload(req.body.thumbnail, {
@@ -54,13 +52,18 @@ export const createCourseController = catchAsyncError(
             original_price,
             discounted_price,
             study_mode,
-            course_id,
+            affiliate_percentage,
             thumbnail: {
               public_id: result.public_id,
               url: result.secure_url,
             },
             created_by: req.user._id,
             starting_date,
+            titleHindi,
+            descriptionHindi,
+            goalType,
+            courseCategory,
+            bannervideoLink,
           });
         }
 
@@ -150,61 +153,35 @@ export const updateCourseController = catchAsyncError(
         original_price,
         discounted_price,
         study_mode,
-        course_id,
+        affiliate_percentage,
         thumbnail,
+        starting_date,
+        titleHindi,
+        descriptionHindi,
+        goalType,
+        courseCategory,
+        bannervideoLink,
       } = req.body;
 
-      // FIND COURSE ID ALREADY EXISTING OR NOT
-      const courses = await courseModel.find();
-      let isCourseIdExist = "";
-      courses.forEach((i) => {
-        isCourseIdExist = i.course_id == course_id;
-      });
+      const course = await courseModel.findById(req.params.id);
 
-      if (isCourseIdExist) {
-        return next(new ErrorHandler("Course Id already exist.", 400, res));
-      } else {
-        const course = await courseModel.findById(req.params.id);
+      if (!course) {
+        // IF COURSE NOT FOUND
+        return next(new ErrorHandler("Course not found", 404, res));
+      }
 
-        if (!course) {
-          // IF COURSE NOT FOUND
-          return next(new ErrorHandler("Course not found", 404, res));
-        }
-
-        if (thumbnail) {
-          // delete existing thumbnail
-          await cloudinary.v2.uploader.destroy(course.thumbnail.public_id);
-          // upload thubnail on cloudinary
-          const cloudinaryResult = await cloudinary.v2.uploader.upload(
-            thumbnail,
-            {
-              folder: "course_thumb",
-            }
-          );
-
-          if (cloudinaryResult) {
-            var updatedCourse = await courseModel.findByIdAndUpdate(
-              course._id,
-              {
-                title,
-                description,
-                original_price,
-                discounted_price,
-                study_mode,
-                course_id,
-                thumbnail: {
-                  public_id: cloudinaryResult.public_id,
-                  url: cloudinaryResult.secure_url,
-                },
-              },
-              {
-                new: true,
-                runValidators: true,
-                useFindAndModify: false,
-              }
-            );
+      if (thumbnail) {
+        // delete existing thumbnail
+        await cloudinary.v2.uploader.destroy(course.thumbnail.public_id);
+        // upload thubnail on cloudinary
+        const cloudinaryResult = await cloudinary.v2.uploader.upload(
+          thumbnail,
+          {
+            folder: "course_thumb",
           }
-        } else {
+        );
+
+        if (cloudinaryResult) {
           var updatedCourse = await courseModel.findByIdAndUpdate(
             course._id,
             {
@@ -213,7 +190,18 @@ export const updateCourseController = catchAsyncError(
               original_price,
               discounted_price,
               study_mode,
-              course_id,
+              affiliate_percentage,
+              starting_date,
+              titleHindi,
+              descriptionHindi,
+              goalType,
+              courseCategory,
+              bannervideoLink,
+              updated_by: req.user._id,
+              thumbnail: {
+                public_id: cloudinaryResult.public_id,
+                url: cloudinaryResult.secure_url,
+              },
             },
             {
               new: true,
@@ -222,13 +210,37 @@ export const updateCourseController = catchAsyncError(
             }
           );
         }
-
-        res.status(201).send({
-          success: true,
-          message: "course updated successfully",
-          updatedCourse,
-        });
+      } else {
+        var updatedCourse = await courseModel.findByIdAndUpdate(
+          course._id,
+          {
+            title,
+            description,
+            original_price,
+            discounted_price,
+            study_mode,
+            affiliate_percentage,
+            starting_date,
+            titleHindi,
+            descriptionHindi,
+            goalType,
+            courseCategory,
+            bannervideoLink,
+            updated_by: req.user._id,
+          },
+          {
+            new: true,
+            runValidators: true,
+            useFindAndModify: false,
+          }
+        );
       }
+
+      res.status(201).send({
+        success: true,
+        message: "course updated successfully",
+        updatedCourse,
+      });
     } catch (error) {
       console.log(error.message);
       return next(new ErrorHandler(error.message, 400, res));
