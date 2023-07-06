@@ -2,6 +2,7 @@ import ErrorHandler from "../utils/errorHandler.js";
 import cloudinary from "cloudinary";
 import { catchAsyncError } from "../middlewares/catchAsyncErrors.js";
 import courseModel from "../models/courseModel.js";
+import batchDetailsModal from "../models/batchDetailsModal.js";
 
 // CREATE COURSE
 export const createCourseController = catchAsyncError(
@@ -247,3 +248,92 @@ export const updateCourseController = catchAsyncError(
     }
   }
 );
+
+// CREATE COURSE DETAILS
+export const createBtachDetails = catchAsyncError(async (req, res, next) => {
+  try {
+    const {
+      for_course,
+      contentEn1,
+      contentEn2,
+      contentEn3,
+      contentEn4,
+      contentHi1,
+      contentHi2,
+      contentHi3,
+      contentHi4,
+    } = req.body;
+
+    const isExist = await batchDetailsModal.findOne({ for_course: for_course });
+
+    if (isExist) {
+      const courseDetail = await batchDetailsModal.findByIdAndUpdate(
+        isExist?._id,
+        {
+          contentEn1,
+          contentEn2,
+          contentEn3,
+          contentEn4,
+          contentHi1,
+          contentHi2,
+          contentHi3,
+          contentHi4,
+        },
+        {
+          new: true,
+          runValidators: true,
+          useFindAndModify: false,
+        }
+      );
+
+      res.status(200).send({
+        success: true,
+        message: "Course details updated successfully.",
+        courseDetail,
+      });
+    } else {
+      const courseDetail = await batchDetailsModal.create({
+        for_course,
+        contentEn1,
+        contentEn2,
+        contentEn3,
+        contentEn4,
+        contentHi1,
+        contentHi2,
+        contentHi3,
+        contentHi4,
+      });
+
+      res.status(201).send({
+        success: true,
+        message: "Course details created successfully.",
+        courseDetail,
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+    return next(new ErrorHandler(error.message, 400, res));
+  }
+});
+
+// GET COURSE DETAILS
+export const getCourseLongDetails = catchAsyncError(async (req, res, next) => {
+  try {
+    const courseDetail = await batchDetailsModal.findOne({
+      for_course: req.params.id,
+    });
+
+    if (!courseDetail) {
+      return next(new ErrorHandler("Course details not found!", 404, res));
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Course details get successfully.",
+      courseDetail,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return next(new ErrorHandler(error.message, 400, res));
+  }
+});

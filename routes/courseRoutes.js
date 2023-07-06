@@ -7,6 +7,8 @@ import {
   getCoursesById,
   updateCourseController,
   deleteCourseController,
+  createBtachDetails,
+  getCourseLongDetails,
 } from "../controllers/courseControllers.js";
 
 // Router Object
@@ -26,5 +28,13 @@ router
   .get(getCoursesById)
   .put(protect, authorizeRoles("10"), updateCourseController)
   .delete(protect, authorizeRoles("10"), deleteCourseController);
+
+// CREATE COURSE DETAILS - POST REQUEST
+router
+  .route("/create-course-details")
+  .post(protect, authorizeRoles("10"), createBtachDetails);
+
+// CREATE COURSE DETAILS - POST REQUEST
+router.route("/get-course-long-details/:id").get(getCourseLongDetails);
 
 export default router;
