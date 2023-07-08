@@ -9,6 +9,8 @@ import {
   deleteCourseController,
   createBtachDetails,
   getCourseLongDetails,
+  createCourseMeta,
+  getCourseMetaDetails,
 } from "../controllers/courseControllers.js";
 
 // Router Object
@@ -36,5 +38,13 @@ router
 
 // CREATE COURSE DETAILS - POST REQUEST
 router.route("/get-course-long-details/:id").get(getCourseLongDetails);
+
+// CREATE COURSE  DETAILS - POST REQUEST
+router
+  .route("/create-course-meta")
+  .post(protect, authorizeRoles("10"), createCourseMeta);
+
+// CREATE COURSE DETAILS - POST REQUEST
+router.route("/get-course-meta-details/:id").get(getCourseMetaDetails);
 
 export default router;

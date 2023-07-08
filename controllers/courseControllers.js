@@ -3,6 +3,7 @@ import cloudinary from "cloudinary";
 import { catchAsyncError } from "../middlewares/catchAsyncErrors.js";
 import courseModel from "../models/courseModel.js";
 import batchDetailsModal from "../models/batchDetailsModal.js";
+import courseMeta from "../models/courseMeta.js";
 
 // CREATE COURSE
 export const createCourseController = catchAsyncError(
@@ -331,6 +332,97 @@ export const getCourseLongDetails = catchAsyncError(async (req, res, next) => {
       success: true,
       message: "Course details get successfully.",
       courseDetail,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return next(new ErrorHandler(error.message, 400, res));
+  }
+});
+
+// CREATE COURSE META DETAILS
+export const createCourseMeta = catchAsyncError(async (req, res, next) => {
+  try {
+    const {
+      for_course,
+      metaTitle,
+      metaKeywords,
+      metaDescription,
+      metaAuthor,
+      metaTitleHindi,
+      metaKeywordsHindi,
+      metaDescriptionHindi,
+      metaAuthorHindi,
+    } = req.body;
+
+    const isExist = await courseMeta.findOne({ for_course: for_course });
+
+    if (isExist) {
+      const courseMetaData = await courseMeta.findByIdAndUpdate(
+        isExist?._id,
+        {
+          metaTitle,
+          metaKeywords,
+          metaDescription,
+          metaAuthor,
+          metaTitleHindi,
+          metaKeywordsHindi,
+          metaDescriptionHindi,
+          metaAuthorHindi,
+          updated_by: req.user._id,
+        },
+        {
+          new: true,
+          runValidators: true,
+          useFindAndModify: false,
+        }
+      );
+
+      res.status(200).send({
+        success: true,
+        message: "Course meta details updated successfully.",
+        courseMetaData,
+      });
+    } else {
+      const courseMetaData = await courseMeta.create({
+        for_course,
+        metaTitle,
+        metaKeywords,
+        metaDescription,
+        metaAuthor,
+        metaTitleHindi,
+        metaKeywordsHindi,
+        metaDescriptionHindi,
+        metaAuthorHindi,
+        created_by: req.user._id,
+      });
+
+      res.status(201).send({
+        success: true,
+        message: "Course meta details created successfully.",
+        courseMetaData,
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+    return next(new ErrorHandler(error.message, 400, res));
+  }
+});
+
+// GET COURSE META DETAILS
+export const getCourseMetaDetails = catchAsyncError(async (req, res, next) => {
+  try {
+    const courseMetaDetail = await courseMeta.findOne({
+      for_course: req.params.id,
+    });
+
+    if (!courseMetaDetail) {
+      return next(new ErrorHandler("Meta details not found!", 404, res));
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Meta details get successfully.",
+      courseMetaDetail,
     });
   } catch (error) {
     console.log(error.message);
