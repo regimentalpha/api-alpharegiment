@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import cloudinary from "cloudinary";
 import { catchAsyncError } from "../middlewares/catchAsyncErrors.js";
+import { uniqueCouponCode } from "../utils/uniqueCoupon.js";
+import affiliateDashboard from "../models/affiliateDashboard.js";
 
 // AFFILIATE REGISTRATION CONTROLLER
 export const affiliateRegisterController = catchAsyncError(
@@ -164,6 +166,66 @@ export const affiliateLoginController = catchAsyncError(
       });
     } catch (error) {
       console.log(error);
+      return next(new ErrorHandler(error.message, 500, res));
+    }
+  }
+);
+
+// SETUP AFFILIATE DASHBOARD
+export const setupAffiliateDashboardController = catchAsyncError(
+  async (req, res, next) => {
+    try {
+      const isExist = await affiliateDashboard.findOne({
+        for_affiliate: req.user._id,
+      });
+
+      if (isExist) {
+        return next(
+          new ErrorHandler("Your Dashboard already setuped!", 401, res)
+        );
+      }
+
+      const dashboard = await affiliateDashboard.create({
+        for_affiliate: req.user._id,
+        deductedRevenue: 0,
+        totalClicks: 0,
+        totalEnrollments: 0,
+        totalRevenue: 0,
+        univesalLink: `https://alpharegiment.in/register/${uniqueCouponCode}`,
+        couponCode: uniqueCouponCode,
+      });
+
+      res.status(201).send({
+        success: true,
+        message: "Dashboard Setup Successfully!",
+        dashboard,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500, res));
+    }
+  }
+);
+
+// GET AFFILIATE DASHBOARD DATA
+export const getAffiliateDashboardController = catchAsyncError(
+  async (req, res, next) => {
+    try {
+      const dashboardData = await affiliateDashboard.findOne({
+        for_affiliate: req.user._id,
+      });
+
+      if (!dashboardData) {
+        return next(
+          new ErrorHandler("Your dashboard data not found!", 401, res)
+        );
+      }
+
+      res.status(200).send({
+        success: true,
+        message: "Dashboard data get Successfully!",
+        dashboardData,
+      });
+    } catch (error) {
       return next(new ErrorHandler(error.message, 500, res));
     }
   }

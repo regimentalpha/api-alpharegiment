@@ -21,9 +21,7 @@ export const coursePaymentController = catchAsyncError(
       paymenData.email = user.email;
       paymenData.phone = user.phone;
       paymenData.buyer_name =
-        user?.first_name + " " + user?.middle_name &&
-        user?.middle_name + " " + user?.last_name &&
-        user?.last_name;
+        user?.first_name + " " + user?.middle_name + " " + user?.last_name;
       paymenData.webhook = process.env.PAYMENT_WEBHOOK_URL;
       paymenData.send_sms = false;
       paymenData.allow_repeated_payments = false;
