@@ -90,6 +90,9 @@ const userSchema = new mongoose.Schema(
     leaving_date: {
       type: String,
     },
+    referred_by: {
+      type: String,
+    },
     // AFFILIATE MARKETING PARAMETERS START
     aff_occupation: {
       type: String,

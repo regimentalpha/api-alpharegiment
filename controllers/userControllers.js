@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
 import cloudinary from "cloudinary";
 import { catchAsyncError } from "../middlewares/catchAsyncErrors.js";
+import affiliateDashboard from "../models/affiliateDashboard.js";
 
 // USER REGISTRATION CONTROLLER
 export const userRegisterController = catchAsyncError(
@@ -24,9 +25,28 @@ export const userRegisterController = catchAsyncError(
         motherName,
         parentEmail,
         parentWhatsAppNo,
+        referred_by,
       } = req.body;
 
-      if ((!first_name, !email, !phone, !password, !dob, !address, !gender)) {
+      if (referred_by) {
+        const isCouponCodeExist = await affiliateDashboard.findOne({
+          couponCode: referred_by,
+        });
+
+        if (!isCouponCodeExist) {
+          return next(new ErrorHandler("Coupon Code doesn't exist", 404, res));
+        }
+      }
+
+      if (
+        !first_name ||
+        !email ||
+        !phone ||
+        !password ||
+        !dob ||
+        !address ||
+        !gender
+      ) {
         return next(
           new ErrorHandler("Please fill all required(*) fields.", 400, res)
         );
@@ -66,6 +86,7 @@ export const userRegisterController = catchAsyncError(
           motherName,
           parentEmail,
           parentWhatsAppNo,
+          referred_by,
         });
 
         res.status(201).send({
@@ -328,7 +349,7 @@ export const removeProfilePic = catchAsyncError(async (req, res, next) => {
       useFindAndModify: false,
     });
   } else {
-    next(new ErrorHandler("Profile not found", 404, res));
+    next(new ErrorHandler("Profile picture not found!", 404, res));
   }
 
   if (updatedUser)
@@ -338,24 +359,114 @@ export const removeProfilePic = catchAsyncError(async (req, res, next) => {
     });
 });
 
-// DELETE USER - ADMIN
-export const deleteUser = catchAsyncError(async (req, res, next) => {
-  const user = await userModal.findById(req.params.id);
+// GET ALL USERS BY ROLE - ADMIN
+export const getAllUsersByAdmin = catchAsyncError(async (req, res, next) => {
+  try {
+    const allAdmins = await userModal.find({ role: "10" });
+    const allStudents = await userModal.find({ role: "11" });
+    const allTeachers = await userModal.find({ role: "12" });
+    const allReceptionists = await userModal.find({ role: "13" });
+    const allStaffs = await userModal.find({ role: "14" });
+    const allAffiliates = await userModal.find({ role: "15" });
 
-  if (!user) {
-    return next(
-      new ErrorHandler(
-        `User does not exist with id: ${req.params.id}`,
-        400,
-        res
-      )
-    );
+    res.status(200).send({
+      success: true,
+      message: "All users found successfully!",
+      allAdmins,
+      allStudents,
+      allTeachers,
+      allReceptionists,
+      allStaffs,
+      allAffiliates,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500, res));
   }
-
-  await user.remove();
-
-  res.status(200).json({
-    success: true,
-    message: "User Deleted Successfully",
-  });
 });
+
+// DELETE AFFILAITE BY ADMIN
+export const deleteUserByAdminController = catchAsyncError(
+  async (req, res, next) => {
+    try {
+      const affiliate = await userModal.findByIdAndDelete(req.params.id);
+
+      if (!affiliate) {
+        return next(new ErrorHandler("User not found with this ID!"));
+      }
+
+      res.status(200).send({
+        success: true,
+        message: "Affiliate Deleted Successfully!",
+      });
+    } catch (error) {
+      console.log(error);
+      return next(new ErrorHandler(error.message, 500, res));
+    }
+  }
+);
+
+// GET USER BY ID - ADMIN
+export const getUserByIdAdminController = catchAsyncError(
+  async (req, res, next) => {
+    try {
+      const userDetails = await userModal.findById(req.params.id);
+
+      if (!userDetails) {
+        return next(new ErrorHandler("User not found with this ID!"));
+      }
+
+      res.status(200).send({
+        success: true,
+        message: "User found successfully!",
+        userDetails,
+      });
+    } catch (error) {
+      console.log(error);
+      return next(new ErrorHandler(error.message, 500, res));
+    }
+  }
+);
+
+// GET USER BY ID - ADMIN
+export const updateUserByIdAdminController = catchAsyncError(
+  async (req, res, next) => {
+    try {
+      const { first_name, email, phone, dob, gender, address } = req.body;
+      const userDetails = await userModal.findById(req.params.id);
+
+      if (!userDetails) {
+        return next(new ErrorHandler("User not found with this ID!", 404, res));
+      }
+
+      if (!first_name || !email || !phone || !dob || !gender || !address) {
+        return next(new ErrorHandler("Please fill all (*) fields!", 404, res));
+      }
+
+      await userModal.findByIdAndUpdate(
+        req.params.id,
+        {
+          first_name,
+          email,
+          phone,
+          dob,
+          gender,
+          address,
+        },
+        {
+          new: true,
+          runValidators: true,
+          useFindAndModify: false,
+        }
+      );
+
+      res.status(200).send({
+        success: true,
+        message: "User Updated successfully!",
+        userDetails,
+      });
+    } catch (error) {
+      console.log(error);
+      return next(new ErrorHandler(error.message, 500, res));
+    }
+  }
+);

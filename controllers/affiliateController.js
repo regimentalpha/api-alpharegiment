@@ -32,23 +32,7 @@ export const affiliateRegisterController = catchAsyncError(
       } = req.body;
 
       if (
-        (!first_name,
-        !email,
-        !phone,
-        !password,
-        !dob,
-        !role,
-        !address,
-        !gender,
-        !profile,
-        !aff_occupation,
-        !aff_state,
-        !aff_bank_name,
-        !aff_bank_ifsc,
-        !aff_bank_acc_no,
-        !aff_bank_branch,
-        !aff_bank_reg_mob,
-        !aff_upi_id)
+        (!first_name, !email, !phone, !password, !dob, !role, !address, !gender)
       ) {
         return next(
           new ErrorHandler("Please fill all required(*) fields.", 400, res)

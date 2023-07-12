@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  deleteUser,
   deviceCodeGenerate,
   removeProfilePic,
   updateProfile,
@@ -8,6 +7,10 @@ import {
   userLoginController,
   userProfile,
   userRegisterController,
+  getAllUsersByAdmin,
+  deleteUserByAdminController,
+  getUserByIdAdminController,
+  updateUserByIdAdminController,
 } from "../controllers/userControllers.js";
 import protect from "../middlewares/authMiddleware.js";
 import authorizeRoles from "../middlewares/roleAuth.js";
@@ -35,6 +38,26 @@ router.route("/upload-profile-pic").post(protect, uploadProfilePic);
 
 // UPLOAD PROFILE PICTURE ===== POST REQUEST
 router.route("/remove-profile-pic").delete(protect, removeProfilePic);
+
+// DELETE USER BY ADMIN ===== DELETE REQUEST BY ADMIN
+router
+  .route("/delete-user/:id")
+  .delete(protect, authorizeRoles("10"), deleteUserByAdminController);
+
+// GET USERS BY ADMIN ===== GET REQUEST
+router
+  .route("/get-all-users")
+  .get(protect, authorizeRoles("10"), getAllUsersByAdmin);
+
+// GET USERS BY ID ADMIN ===== GET REQUEST
+router
+  .route("/get-user-details/:id")
+  .get(protect, authorizeRoles("10"), getUserByIdAdminController);
+
+// UPDATE USERS BY ID ADMIN ===== PUT REQUEST
+router
+  .route("/update-user-details/:id")
+  .put(protect, authorizeRoles("10"), updateUserByIdAdminController);
 
 // PROTECTED USER ROUTE AUTH
 router.route("/user-auth").get(protect, async (req, res) => {

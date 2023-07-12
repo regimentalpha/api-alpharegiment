@@ -10,9 +10,19 @@ export const coursePaymentController = catchAsyncError(
       const { amount, purpose } = req.body;
       const user = req.user;
 
+      if (!amount || !purpose) {
+        return next(
+          new ErrorHandler(
+            "AMOUNT and PURPOSE is required for payment!",
+            401,
+            res
+          )
+        );
+      }
+
       var paymenData = new Insta.PaymentData();
 
-      const REDIRECT_URL = process.env.PAYMENT_REDIRECT_URL;
+      const REDIRECT_URL = `${process.env.FRONTEND_URL}/verification`;
 
       paymenData.setRedirectUrl(REDIRECT_URL);
       paymenData.send_email = false;
@@ -22,7 +32,7 @@ export const coursePaymentController = catchAsyncError(
       paymenData.phone = user.phone;
       paymenData.buyer_name =
         user?.first_name + " " + user?.middle_name + " " + user?.last_name;
-      paymenData.webhook = process.env.PAYMENT_WEBHOOK_URL;
+      paymenData.webhook = `${process.env.FRONTEND_URL}/course-details`;
       paymenData.send_sms = false;
       paymenData.allow_repeated_payments = false;
 
@@ -32,6 +42,7 @@ export const coursePaymentController = catchAsyncError(
           return next(new ErrorHandler(error.message, 404, res));
         } else {
           const resData = JSON.parse(response);
+          console.log(resData);
           res.status(200).send(resData);
         }
       });
@@ -93,10 +104,8 @@ export const paymentRequestDoneController = catchAsyncError(
 // GET PAYMENT DETAILS DONE BY USER - DATABASE DETAILS
 export const getUserPaymentDetails = catchAsyncError(async (req, res, next) => {
   try {
-    const user = req.user;
-
     const paymentDetails = await paymentRequestDone.find({
-      payment_by: user._id,
+      payment_by: req.user._id,
     });
 
     if (paymentDetails.length === 0) {
@@ -120,7 +129,7 @@ export const checkPaymentStatus = catchAsyncError(async (req, res, next) => {
     if (!payment_req_id) {
       return next(
         new ErrorHandler(
-          "Please provide dedicated Payment Request Id for this transaction",
+          "Please provide dedicated Payment Request Id for your transaction!",
           404,
           res
         )
